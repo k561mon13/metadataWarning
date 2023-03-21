@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy>
+   
+    <version>4.0.2</version>          <!-- The version of SpatialMap this module comes from -->
+    <lastupdated>2018-06-14</lastupdated>  <!-- The SpatialMap version this module was last updated -->
+    <requiresversion></requiresversion>   <!-- Minimum SpatialMap version this module requires to run -->
+    <description></description>   <!-- Short description of this module (shown in the admin console) -->
+
+    <stoponerror>true</stoponerror>
+
+</deploy>

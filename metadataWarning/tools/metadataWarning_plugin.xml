@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tool type="plugin">
+    <displayname>metadataWarning</displayname>
+    <description>metadataWarning</description>
+    <src><![CDATA[
+		metadataWarning.init ();
+    ]]></src>
+    <jssrc><![CDATA[
+		var metadataWarning = {
+			init: function () {
+				warning =  ' &#9888;';
+				warning_vis = '⚠'
+				
+				external_msg = '&#127760; '
+				external_msg_vis = '🌐 '
+				internal_msg = '&#128738; '
+				internal_msg_vis = '🛢 '
+				file_msg = '&#128462; '
+				file_msg_vis = '🗎 '
+				
+				external = ['wfs','wms','arcgisrest'];
+				internal = ['mssql','postgis','database','oraclespatial','sde','sde2','raster']
+				file = ['shapefile']
+			
+				//VIGTIGT: Af ydelseshensyn skal man kun have den korteste version af et keyword. F.eks skal man ikke have 'ikke opdateret', men kun 'ikke opd'. Det er heller ikke nødvendigt at have 'dataudtræk', hvis man bare har 'udtræk'.
+				//Programmets logik skelner ikke mellem store og små bogstaver, og sørger for at markere hele ord både forud og bagud, så 'udtræk' vil også markere 'dataudtræk'. Ligeledes vil 'ej opd' også markere 'ej opdateret'.
+				keywords = ['ikke ajour',
+							'ikke opd',
+							'udtræk',
+							'ej ajour',
+							'ej opd',
+							'ajourføres ikke',
+							'ajourføres ej',
+							'opdateres ikke',
+							'opdateres ej']
+				
+				spm.events.addListener('THEMEGROUP_EXPANSION_STATE_CHANGED', function(event) {
+					themes = document.getElementsByClassName('theme small');
+					for (i=0;i<themes.length;i++){
+						themename = themes[i].getAttribute("themename");
+						theme_obj = spm.themeContainer.getTheme(themename);
+						
+						theme_text = themes[i].getElementsByClassName('txt')[0];
+						theme_metadata = theme_text.getElementsByTagName('span')[0].innerHTML;
+						theme_metadata_lower = theme_metadata.toLowerCase()
+						//console.log(theme_metadata);
+						
+						//if ((external.includes(theme_obj._initialConfig.primaryendpointtype)==true) && (theme_text.getElementsByTagName('span')[0].innerHTML.startsWith(external_msg_vis)==false)){
+						//themes[i].getElementsByClassName('txt')[0].getElementsByTagName('span')[0].innerHTML = external_msg + theme_text.getElementsByTagName('span')[0].innerHTML
+						//}
+						//else if ((internal.includes(theme_obj._initialConfig.primaryendpointtype)==true) && (theme_text.getElementsByTagName('span')[0].innerHTML.startsWith(internal_msg_vis)==false)){
+						//themes[i].getElementsByClassName('txt')[0].getElementsByTagName('span')[0].innerHTML = internal_msg + theme_text.getElementsByTagName('span')[0].innerHTML
+						//}		
+						//else if ((file.includes(theme_obj._initialConfig.primaryendpointtype)==true) && (theme_text.getElementsByTagName('span')[0].innerHTML.startsWith(file_msg_vis)==false)){
+						//themes[i].getElementsByClassName('txt')[0].getElementsByTagName('span')[0].innerHTML = file_msg + theme_text.getElementsByTagName('span')[0].innerHTML
+						//}
+						
+						//endpointtype = ('[DATAKILDE: '+theme_obj._initialConfig.primaryendpointtype).toUpperCase()+'] ';
+						//if (theme_text.getElementsByTagName('span')[0].innerHTML.startsWith(endpointtype)==false){
+						//themes[i].getElementsByClassName('txt')[0].getElementsByTagName('span')[0].innerHTML = endpointtype + theme_text.getElementsByTagName('span')[0].innerHTML
+						//}
+						
+						if (theme_text.getElementsByTagName('span')[0].innerHTML.toLowerCase().includes('</b>')==false){
+							for (j=0;j<keywords.length;j++){
+								keyword = keywords[j].toLowerCase();
+								if (theme_text.getElementsByTagName('span')[0].innerHTML.toLowerCase().includes(keyword)==true){
+									if (theme_text.getElementsByTagName('h4')[0].innerHTML.endsWith(warning_vis)==false){
+										themes[i].getElementsByClassName('txt')[0].getElementsByTagName('h4')[0].innerHTML = theme_text.getElementsByTagName('h4')[0].innerHTML + warning;
+										}
+									
+									pos = theme_text.getElementsByTagName('span')[0].innerHTML.toLowerCase().indexOf(keyword)
+									var pos_end = pos+keyword.length
+									
+									while ((pos-1 > 0) && ('. '.includes(theme_text.getElementsByTagName('span')[0].innerHTML[pos-1])==false)){
+										pos--;
+									}
+									
+									while ((pos_end+1 < theme_text.getElementsByTagName('span')[0].innerHTML.length) && ('. '.includes(theme_text.getElementsByTagName('span')[0].innerHTML[pos_end])==false)){
+										pos_end++;
+									}
+									
+									
+									themes[i].getElementsByClassName('txt')[0].getElementsByTagName('span')[0].innerHTML = theme_text.getElementsByTagName('span')[0].innerHTML.slice(0,pos) + '<b style="color:blue">' + theme_text.getElementsByTagName('span')[0].innerHTML.slice(pos,pos_end) + '</b>' + theme_text.getElementsByTagName('span')[0].innerHTML.slice(pos_end,theme_text.getElementsByTagName('span')[0].innerHTML.length);
+									//pos = theme_text.title.indexOf(keyword)
+									//themes[i].getElementsByClassName('txt')[0].title = theme_text.title.slice(0,pos) + theme_text.title.slice(pos,pos+keyword.length).toUpperCase() + theme_text.title.slice(pos+keyword.length,theme_text.title.length);
+								}
+							}
+						
+							}
+					}
+				});
+			}
+		};
+     ]]></jssrc>
+</tool>
+
+
+ 
